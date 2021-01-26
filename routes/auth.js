@@ -1,32 +1,38 @@
 const express = require('express');
-const passport = require('passport');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 const router = express.Router();
 
-router.post('/login', (req, res, next) => {
-    passport.authenticate('local', (passportError, user, info) => {
-        if(passportError || !user) {
-            res.status(400).json({
-                "message": info.reason
-            });
-            return;
-        }
+router.post('/login', async (req, res) => {
+    const { phone, password } = req.body;
 
-        req.login(user, { session: false }, (loginError) => {
-            if(loginError) {
-                res.status(400).json({
-                    "message": loginError
-                });
-                return;
-            }
-            const token = jwt.sign(
-                { phone: user.phone, name: user.name },
-                'jwt-secret-key'
-            );
-            res.status(200).json({token});
+    try {
+        const user = await User.findOne({
+            where: { phone: phone }
         });
-    })(req, res, next);
+
+        if(!user) {
+            res.status(400).json({
+                "message": "User Not Found"
+            });
+        } else {
+            if(password == user.password) {
+                res.status(200).json({
+                    "message": "LOGIN SUCCESS"
+                });
+            } else {
+                res.status(400).json({
+                    "message": "Password Error"
+                });
+            }
+        }
+    } catch(e) {
+        res.status(400).json({
+            "message": "Client Error - " + e.toString()
+        });
+    }
 });
+
+module.exports = router;

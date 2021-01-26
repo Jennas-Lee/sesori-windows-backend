@@ -1,19 +1,14 @@
 const express = require('express');
 const { sequelize } = require('./models');
-const passport = require('passport');
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 8081;
 
 const authRouter = require('./routes/auth');
 
-const passportConfig = require('./passport');
-
 const app = express();
-passportConfig();
 
 app.set('port', PORT);
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }));
-app.use(passport.initialize());
 
 app.use('/auth', authRouter);
 
