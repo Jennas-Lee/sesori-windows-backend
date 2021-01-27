@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const { sequelize } = require('./models');
 const PORT = process.env.PORT || 8081;
 
@@ -9,6 +10,7 @@ const app = express();
 app.set('port', PORT);
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }));
+app.use(cors());
 
 app.use('/auth', authRouter);
 
